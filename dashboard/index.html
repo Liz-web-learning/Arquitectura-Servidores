@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de seguimiento · Unidad 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../index.html" style="color:inherit">Arquitectura de <b>Servidores</b></a> · Dashboard</div>
+  <div class="spacer"></div>
+  <div class="who mono"><span id="origen"></span></div>
+</div>
+
+<!-- PIN -->
+<div class="gate" id="pin-gate">
+  <div class="gate-card">
+    <div class="chip-ico">🔒</div>
+    <h2>Panel de la docente</h2>
+    <p class="muted" style="font-size:.9rem">Ingresa el PIN para ver el seguimiento del grupo.</p>
+    <div class="field"><label>PIN</label><input id="pin" type="password"><div class="err">PIN incorrecto.</div></div>
+    <button class="btn" id="pin-ok" style="width:100%;justify-content:center">Entrar →</button>
+  </div>
+</div>
+
+<main class="wrap tema-body" id="panel" style="display:none">
+  <header class="tema-head">
+    <p class="num">SEGUIMIENTO · UNIDAD 1</p>
+    <h1>Avance del grupo</h1>
+    <p class="muted" id="fuente-msg"></p>
+  </header>
+
+  <div class="dash-grid">
+    <div class="metric"><div class="v" id="m-est">0</div><div class="k">Estudiantes</div></div>
+    <div class="metric"><div class="v" id="m-evt">0</div><div class="k">Interacciones</div></div>
+    <div class="metric"><div class="v" id="m-comp">0</div><div class="k">Módulos completados</div></div>
+    <div class="metric"><div class="v" id="m-quiz">0%</div><div class="k">Promedio en quizzes</div></div>
+  </div>
+
+  <h2>Interacción por tema</h2>
+  <table><thead><tr><th>Tema</th><th>Vistas</th><th>Interacciones</th><th>Distribución</th></tr></thead>
+    <tbody id="tbl-temas"></tbody></table>
+
+  <h2 style="margin-top:2em">Por estudiante</h2>
+  <table><thead><tr><th>Estudiante</th><th>Correo</th><th>Temas vistos</th><th>Completados</th><th>Quiz</th></tr></thead>
+    <tbody id="tbl-est"></tbody></table>
+
+  <div class="controls" style="margin-top:24px">
+    <button class="btn" id="export">⬇ Exportar CSV</button>
+    <button class="btn ghost" id="refresh">↻ Actualizar</button>
+  </div>
+  <p class="hint muted" id="nota-local"></p>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const CFG = window.CONFIG || {};
+const TEMAS = {t1:"1.1 Evolución",t2:"1.2 Lógica digital",t3:"1.3 Procesador",t4:"1.4 Memoria",t5:"1.5 Entrada-Salida",t6:"1.6 Multiproc.",t7:"1.7 Redundancia"};
+
+// --- PIN ---
+const pinGate=document.getElementById("pin-gate");
+document.getElementById("pin-ok").onclick=()=>{
+  const v=document.getElementById("pin").value;
+  if(v===String(CFG.DASHBOARD_PIN||"1234")){ pinGate.classList.add("hidden");
+    document.getElementById("panel").style.display="block"; cargar(); }
+  else document.querySelector("#pin-gate .field").classList.add("invalid");
+};
+document.getElementById("pin").addEventListener("keydown",e=>{ if(e.key==="Enter")document.getElementById("pin-ok").click(); });
+
+// --- Carga de datos (endpoint o local) ---
+async function obtenerEventos(){
+  if(CFG.ENDPOINT){
+    try{
+      const r = await fetch(CFG.ENDPOINT, {method:"GET"});
+      const data = await r.json();
+      document.getElementById("origen").textContent="● remoto (Google Sheet)";
+      document.getElementById("fuente-msg").textContent="Datos en vivo desde tu hoja de cálculo.";
+      return Array.isArray(data) ? data : (data.eventos||[]);
+    }catch(e){ /* cae a local */ }
+  }
+  document.getElementById("origen").textContent="● local (este navegador)";
+  document.getElementById("fuente-msg").textContent="Mostrando datos guardados en este navegador (modo demo). Configura ENDPOINT en js/config.js para datos centralizados.";
+  document.getElementById("nota-local").textContent="Nota: en modo local solo se ven las interacciones hechas desde este mismo equipo/navegador.";
+  return Tracker._eventos();
+}
+
+async function cargar(){
+  const ev = await obtenerEventos();
+  const estudiantes = {}; const temas = {};
+  Object.keys(TEMAS).forEach(t=>temas[t]={vistas:0,inter:0});
+  let completados=0, quizSum=0, quizCount=0;
+
+  ev.forEach(e=>{
+    const key = e.correo || "anon";
+    estudiantes[key] = estudiantes[key] || {nombre:e.nombre||"", apellido:e.apellido||"", correo:key, vistos:new Set(), comp:new Set(), quizzes:[]};
+    if(e.tipo==="vista" && temas[e.tema]){ temas[e.tema].vistas++; estudiantes[key].vistos.add(e.tema); }
+    if(e.tipo==="interaccion" && temas[e.tema]) temas[e.tema].inter++;
+    if(e.tipo==="modulo_completado"){ completados++; estudiantes[key].comp.add(e.tema); }
+    if(e.tipo==="quiz"){
+      const m = String(e.detalle).match(/(\d+)\/(\d+)/);
+      if(m){ const pct = (+m[1])/(+m[2])*100; quizSum+=pct; quizCount++; estudiantes[key].quizzes.push(pct); }
+    }
+  });
+
+  const ests = Object.values(estudiantes).filter(e=>e.correo!=="anon");
+  document.getElementById("m-est").textContent = ests.length;
+  document.getElementById("m-evt").textContent = ev.length;
+  document.getElementById("m-comp").textContent = completados;
+  document.getElementById("m-quiz").textContent = quizCount ? Math.round(quizSum/quizCount)+"%" : "–";
+
+  const maxInter = Math.max(1, ...Object.values(temas).map(t=>t.inter+t.vistas));
+  document.getElementById("tbl-temas").innerHTML = Object.keys(TEMAS).map(t=>{
+    const d=temas[t]; const w=(d.inter+d.vistas)/maxInter*100;
+    return `<tr><td>${TEMAS[t]}</td><td>${d.vistas}</td><td>${d.inter}</td>
+      <td><div class="mini-bar"><span style="width:${w}%"></span></div></td></tr>`;
+  }).join("");
+
+  document.getElementById("tbl-est").innerHTML = ests.length ? ests.map(e=>{
+    const prom = e.quizzes.length ? Math.round(e.quizzes.reduce((a,b)=>a+b,0)/e.quizzes.length)+"%" : "–";
+    return `<tr><td>${e.nombre} ${e.apellido}</td><td class="mono" style="font-size:.78rem">${e.correo}</td>
+      <td>${e.vistos.size}/7</td><td>${e.comp.size}/7</td><td>${prom}</td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="muted">Aún no hay registros.</td></tr>`;
+
+  // exportar
+  document.getElementById("export").onclick=()=>{
+    const filas=[["fecha","nombre","apellido","correo","tema","tipo","detalle","valor"]];
+    ev.forEach(e=>filas.push([e.ts,e.nombre,e.apellido,e.correo,TEMAS[e.tema]||e.tema,e.tipo,e.detalle,e.valor]));
+    const csv=filas.map(f=>f.map(c=>`"${String(c||"").replace(/"/g,'""')}"`).join(",")).join("\n");
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv"}));
+    a.download="seguimiento_unidad1.csv"; a.click();
+  };
+}
+document.getElementById("refresh").onclick=cargar;
+</script>
+</body>
+</html>

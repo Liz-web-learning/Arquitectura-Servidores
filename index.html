@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura de Servidores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- GATE de identificación -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="chip-ico">▦</div>
+    <p class="eyebrow">Material interactivo</p>
+    <h2>Arquitectura de Servidores</h2>
+    <p class="muted" style="font-size:.9rem">Ingresa tus datos para acceder al material interactivo del curso.</p>
+    <form id="gate-form" novalidate>
+      <div class="field">
+        <label>Nombre(s)</label>
+        <input name="nombre" type="text" autocomplete="given-name">
+        <div class="err">Ingresa tu nombre.</div>
+      </div>
+      <div class="field">
+        <label>Apellido(s)</label>
+        <input name="apellido" type="text" autocomplete="family-name">
+        <div class="err">Ingresa tu apellido.</div>
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input name="correo" type="email" autocomplete="email">
+        <div class="err">Ingresa un correo válido.</div>
+      </div>
+      <button class="btn" type="submit" style="width:100%;justify-content:center">Ingresar al curso →</button>
+    </form>
+    <p class="note">Esta información se usa únicamente para el seguimiento académico de tu avance en el curso.</p>
+  </div>
+</div>
+
+<!-- BARRA -->
+<div class="topbar">
+  <div class="brand">Arquitectura de <b>Servidores</b></div>
+  <div class="spacer"></div>
+  <div class="who"></div>
+</div>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <header class="course-hero">
+    <p class="kicker">Material interactivo del curso</p>
+    <h1>Arquitectura de Servidores</h1>
+    <p class="sub">Cada unidad se libera en la sesión correspondiente.
+      Cuando esté disponible encontrarás simuladores, laboratorios
+      y quizzes integrados. Tu avance queda registrado automáticamente.</p>
+  </header>
+
+  <!-- UNIDADES -->
+  <section class="units" id="units">
+
+    <!-- ====== UNIDAD 1 — DISPONIBLE ====== -->
+    <a class="unit-card available" href="unidad1/index.html">
+      <div class="uc-accent"></div>
+      <div class="uc-body">
+        <div class="uc-num">Unidad 1 <span class="badge live">● Disponible</span></div>
+        <div class="uc-title">Introducción a la organización computacional</div>
+        <ul class="uc-topics">
+          <li>Evolución de los dispositivos de cómputo</li>
+          <li>Componentes de hardware y lógica digital</li>
+          <li>Elementos del procesador</li>
+          <li>Subsistema de memoria</li>
+          <li>Subsistema de entrada-salida</li>
+          <li>Multiprocesamiento</li>
+          <li>Concepto de redundancia</li>
+        </ul>
+      </div>
+      <div class="uc-foot">▸ Entrar a la unidad</div>
+    </a>
+
+    <!-- ====== UNIDAD 2 — PRÓXIMAMENTE ====== -->
+    <div class="unit-card soon">
+      <div class="uc-accent"></div>
+      <div class="uc-body">
+        <div class="uc-num">Unidad 2 <span class="badge soon">Próximamente</span></div>
+        <div class="uc-title">Arquitectura de procesador y memoria</div>
+        <ul class="uc-topics">
+          <li>La arquitectura Von Neumann</li>
+          <li>Memoria física y virtual</li>
+          <li>Jerarquía de memoria</li>
+          <li>Ley de Moore y el futuro del procesamiento</li>
+          <li>Procesamiento virtual</li>
+          <li>Hiperconvergencia</li>
+        </ul>
+      </div>
+      <div class="uc-foot">🔒 Se libera en la sesión 2</div>
+    </div>
+
+    <!-- ====== UNIDAD 3 — PRÓXIMAMENTE ====== -->
+    <div class="unit-card soon">
+      <div class="uc-accent"></div>
+      <div class="uc-body">
+        <div class="uc-num">Unidad 3 <span class="badge soon">Próximamente</span></div>
+        <div class="uc-title">Virtualización de servidores</div>
+        <ul class="uc-topics">
+          <li>Introducción a la virtualización</li>
+          <li>Tipos de hipervisores y virtualización</li>
+          <li>Creación de un servidor virtual</li>
+          <li>Seguridad en el hipervisor</li>
+          <li>Aislamiento y niveles de seguridad</li>
+          <li>Seguridad en un servidor virtual</li>
+        </ul>
+      </div>
+      <div class="uc-foot">🔒 Se libera en la sesión 3</div>
+    </div>
+
+    <!-- ====== UNIDAD 4 — PRÓXIMAMENTE ====== -->
+    <div class="unit-card soon">
+      <div class="uc-accent"></div>
+      <div class="uc-body">
+        <div class="uc-num">Unidad 4 <span class="badge soon">Próximamente</span></div>
+        <div class="uc-title">Servidores en la nube</div>
+        <ul class="uc-topics">
+          <li>Cómputo en la nube</li>
+          <li>Seguridad en la nube</li>
+          <li>IaaS · PaaS · SaaS</li>
+          <li>FaaS (Función como servicio)</li>
+          <li>Tipos de amenazas en la nube</li>
+        </ul>
+      </div>
+      <div class="uc-foot">🔒 Se libera en la sesión 4</div>
+    </div>
+
+    <!-- ====== UNIDAD 5 — PRÓXIMAMENTE ====== -->
+    <div class="unit-card soon">
+      <div class="uc-accent"></div>
+      <div class="uc-body">
+        <div class="uc-num">Unidad 5 <span class="badge soon">Próximamente</span></div>
+        <div class="uc-title">Seguridad en sistemas operativos para servidores</div>
+        <ul class="uc-topics">
+          <li>Gestión de seguridad en Windows Server</li>
+          <li>Seguridad en recursos compartidos</li>
+          <li>Gestión de seguridad en Linux/UNIX</li>
+          <li>Auditoría de accesos</li>
+          <li>Gestión de usuarios</li>
+          <li>Host Based Firewall</li>
+        </ul>
+      </div>
+      <div class="uc-foot">🔒 Se libera en la sesión 5</div>
+    </div>
+
+  </section>
+
+  <footer class="footer">
+    INFOTEC · Arquitectura de Servidores · Material interactivo · 2026 ·
+    <a href="dashboard/" style="color:var(--muted)">Panel docente</a>
+  </footer>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/tracking.js"></script>
+<script src="js/main.js"></script>
+<script>
+  // Registrar clic de navegación solo en la unidad disponible
+  document.querySelector(".unit-card.available").addEventListener("click", function() {
+    Tracker.interaccion("portada", "abrir unidad", "unidad1");
+  });
+</script>
+</body>
+</html>

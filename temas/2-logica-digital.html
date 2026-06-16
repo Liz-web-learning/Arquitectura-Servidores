@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.2 Componentes de hardware y lógica digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.2</p>
+    <h1>Componentes de hardware y lógica digital</h1>
+    <p class="muted">Toda computadora se construye sobre lógica digital: circuitos que trabajan con dos estados, 0 y 1. Las compuertas lógicas son sus ladrillos elementales.</p>
+  </header>
+
+  <h2>Compuertas lógicas</h2>
+  <p>Una <strong>compuerta</strong> recibe entradas binarias y produce una salida según una regla. Combinándolas se construyen circuitos <em>combinacionales</em> (la salida depende solo de las entradas) y <em>secuenciales</em> (también del estado previo: tienen memoria, como un flip-flop que guarda 1 bit).</p>
+
+  <div class="lab">
+    <h3>⊻ Laboratorio · Simulador de compuertas</h3>
+    <p class="hint">Cambia las entradas (clic para alternar 0/1) y elige la compuerta. Observa la salida.</p>
+    <div class="controls">
+      <div style="text-align:center">
+        <button class="bit" id="A">0</button><div class="bit-label">Entrada A</div>
+      </div>
+      <div style="text-align:center">
+        <button class="bit" id="B">0</button><div class="bit-label">Entrada B</div>
+      </div>
+      <select id="gate" class="btn ghost" style="font-family:var(--fmono)">
+        <option value="AND">AND</option>
+        <option value="OR">OR</option>
+        <option value="XOR">XOR</option>
+        <option value="NAND">NAND</option>
+        <option value="NOT">NOT (solo A)</option>
+      </select>
+    </div>
+    <div class="readout" id="out">Salida = <b>0</b></div>
+    <p class="hint" id="explica"></p>
+  </div>
+
+  <div class="callout">
+    <strong>Reto:</strong> un motor de servidor solo debe encenderse si <em>dos sensores</em> están activos a la vez. ¿Qué compuerta usarías? Pruébalo arriba poniendo A=1 y B=1.
+    <span class="example" id="reto-ok"></span>
+  </div>
+
+  <h2>Componentes físicos del servidor</h2>
+  <p>Sobre esa base lógica se montan las piezas reales: procesador (CPU), memoria (RAM), almacenamiento (HDD/SSD), placa madre, fuente de poder y tarjetas de E/S (red, controladoras de disco).</p>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="1-evolucion.html">← Evolución</a>
+    <a class="btn" href="3-procesador.html">Siguiente: El procesador →</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t2";
+Tracker.pageView(TEMA, "1.2 Componentes de hardware y lógica digital");
+
+let a = 0, b = 0;
+const bitA = document.getElementById("A"), bitB = document.getElementById("B");
+const gate = document.getElementById("gate"), out = document.getElementById("out"), explica = document.getElementById("explica");
+
+function calc(){
+  const g = gate.value;
+  let r;
+  switch(g){
+    case "AND":  r = a & b; break;
+    case "OR":   r = a | b; break;
+    case "XOR":  r = a ^ b; break;
+    case "NAND": r = (a & b) ? 0 : 1; break;
+    case "NOT":  r = a ? 0 : 1; break;
+  }
+  out.innerHTML = `Salida = <b>${r}</b>`;
+  out.className = "readout " + (r ? "true" : "false");
+  const txt = {
+    AND:"AND da 1 solo si A y B son 1.", OR:"OR da 1 si al menos una entrada es 1.",
+    XOR:"XOR da 1 si las entradas son distintas.", NAND:"NAND es la negación de AND.",
+    NOT:"NOT invierte la entrada A (ignora B)."
+  };
+  explica.textContent = txt[g];
+  document.getElementById("reto-ok").textContent =
+    (g==="AND" && a===1 && b===1) ? "  ✓ ¡Correcto! Con AND el motor enciende solo con ambos sensores activos." : "";
+}
+function toggle(which){
+  if(which==="A"){ a = a?0:1; bitA.textContent = a; bitA.classList.toggle("on", !!a); }
+  else { b = b?0:1; bitB.textContent = b; bitB.classList.toggle("on", !!b); }
+  Tracker.interaccion(TEMA, "cambiar entrada", `${which}=${which==="A"?a:b}`);
+  calc();
+}
+bitA.onclick=()=>toggle("A"); bitB.onclick=()=>toggle("B");
+gate.onchange=()=>{ Tracker.interaccion(TEMA,"elegir compuerta",gate.value); calc(); };
+calc();
+
+renderQuiz(TEMA, [
+  { q:"¿Qué compuerta produce 1 únicamente cuando ambas entradas son 1?",
+    opciones:["OR","AND","XOR","NOT"], correcta:1 },
+  { q:"Un circuito cuya salida depende también del estado anterior se llama…",
+    opciones:["combinacional","secuencial","analógico","binario"], correcta:1 },
+  { q:"La lógica digital trabaja fundamentalmente con…",
+    opciones:["10 estados (decimal)","valores continuos","dos estados: 0 y 1","letras del alfabeto"], correcta:2 }
+]);
+</script>
+</body>
+</html>

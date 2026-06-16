@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.5 Subsistema de entrada-salida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.5</p>
+    <h1>Subsistema de entrada-salida</h1>
+    <p class="muted">El subsistema de E/S comunica a la computadora con el exterior: periféricos, redes y almacenamiento. La clave es no desperdiciar la CPU esperando.</p>
+  </header>
+
+  <ul>
+    <li><strong>Entrada:</strong> teclado, sensores, tarjeta de red (datos que llegan).</li>
+    <li><strong>Salida:</strong> monitor, impresora, tarjeta de red (datos que salen).</li>
+    <li><strong>Controladores:</strong> intermedian entre la CPU y cada dispositivo.</li>
+  </ul>
+
+  <h2>¿Cómo gestiona la CPU la E/S?</h2>
+  <p>Compara las dos estrategias y observa cuánto tiempo de CPU se desperdicia.</p>
+
+  <div class="lab">
+    <h3>⇄ Laboratorio · CPU ocupada vs. liberada</h3>
+    <div class="controls">
+      <button class="btn ghost" id="modo-poll">Espera activa (polling)</button>
+      <button class="btn" id="modo-dma">Interrupciones + DMA</button>
+    </div>
+    <div class="bars">
+      <div class="bar-row"><span class="lbl">CPU útil</span><div class="bar-track"><div class="bar-fill signal" id="bar-util" style="width:20%"></div></div></div>
+      <div class="bar-row"><span class="lbl">CPU en espera</span><div class="bar-track"><div class="bar-fill" id="bar-wait" style="width:80%"></div></div></div>
+    </div>
+    <div class="readout" id="io-msg"></div>
+  </div>
+
+  <ul>
+    <li><strong>Interrupciones:</strong> el dispositivo "avisa" a la CPU cuando está listo, en lugar de hacerla preguntar todo el tiempo. Ej.: la tarjeta de red interrumpe a la CPU al llegar un paquete.</li>
+    <li><strong>DMA (Acceso Directo a Memoria):</strong> el dispositivo transfiere datos a la RAM sin pasar por la CPU. Ej.: copiar un archivo grande del disco a memoria mientras la CPU atiende otras peticiones.</li>
+  </ul>
+
+  <div class="callout signal"><strong>En un servidor web</strong> el subsistema de E/S es crítico: gestiona miles de peticiones de red simultáneas sin bloquear el procesador.</div>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="4-memoria.html">← Memoria</a>
+    <a class="btn" href="6-multiprocesamiento.html">Siguiente: Multiprocesamiento →</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t5";
+Tracker.pageView(TEMA, "1.5 Subsistema de entrada-salida");
+
+const util=document.getElementById("bar-util"), wait=document.getElementById("bar-wait"), msg=document.getElementById("io-msg");
+function setModo(m){
+  if(m==="poll"){
+    util.style.width="20%"; wait.style.width="80%";
+    msg.innerHTML="<b style='color:var(--alert)'>Polling:</b> la CPU pregunta una y otra vez si el dispositivo está listo. Desperdicia ~80% de su tiempo esperando.";
+    document.getElementById("modo-poll").className="btn"; document.getElementById("modo-dma").className="btn ghost";
+  } else {
+    util.style.width="90%"; wait.style.width="10%";
+    msg.innerHTML="<b style='color:var(--ok)'>Interrupciones + DMA:</b> el dispositivo avisa cuando termina y transfiere datos solo. La CPU queda libre ~90% para otras tareas.";
+    document.getElementById("modo-dma").className="btn"; document.getElementById("modo-poll").className="btn ghost";
+  }
+  Tracker.interaccion(TEMA,"comparar gestión E/S", m);
+  Tracker.completarModulo(TEMA,"1.5 Subsistema de entrada-salida");
+}
+document.getElementById("modo-poll").onclick=()=>setModo("poll");
+document.getElementById("modo-dma").onclick=()=>setModo("dma");
+setModo("dma");
+
+renderQuiz(TEMA, [
+  { q:"Una interrupción permite que…",
+    opciones:["la CPU pregunte constantemente al dispositivo","el dispositivo avise a la CPU cuando está listo","se apague el servidor","se borre la RAM"], correcta:1 },
+  { q:"El DMA sirve para…",
+    opciones:["transferir datos a la RAM sin ocupar a la CPU","aumentar la resolución del monitor","cifrar el disco","enfriar el procesador"], correcta:0 },
+  { q:"La estrategia que más desperdicia tiempo de CPU es…",
+    opciones:["interrupciones","DMA","espera activa (polling)","caché"], correcta:2 }
+]);
+</script>
+</body>
+</html>

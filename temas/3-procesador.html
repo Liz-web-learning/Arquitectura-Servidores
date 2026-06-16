@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.3 Elementos del procesador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.3</p>
+    <h1>Elementos del procesador</h1>
+    <p class="muted">El procesador (CPU) ejecuta las instrucciones de los programas. Sus piezas: la Unidad de Control, la Unidad Aritmético-Lógica, los registros y la caché.</p>
+  </header>
+
+  <ul>
+    <li><strong>Unidad de Control (UC):</strong> coordina las operaciones; decide qué instrucción se ejecuta y cuándo.</li>
+    <li><strong>Unidad Aritmético-Lógica (ALU):</strong> realiza cálculos y comparaciones.</li>
+    <li><strong>Registros:</strong> memoria interna ultrarrápida para datos en uso inmediato (ej.: el contador de programa guarda la dirección de la siguiente instrucción).</li>
+    <li><strong>Caché:</strong> memoria intermedia muy veloz (L1, L2, L3) que reduce los accesos a la RAM.</li>
+  </ul>
+
+  <h2>El ciclo de instrucción</h2>
+  <p>Toda instrucción pasa por tres fases. Ejecutemos <span class="mono">C = A + B</span> paso a paso.</p>
+
+  <div class="lab">
+    <h3>▣ Laboratorio · Ciclo Fetch–Decode–Execute</h3>
+    <div class="cpu-diagram">
+      <div class="unit" id="u-uc"><div class="uname">Unidad de Control</div><div class="uinfo">busca y decodifica</div></div>
+      <div class="unit" id="u-alu"><div class="uname">ALU</div><div class="uinfo">calcula A + B</div></div>
+      <div class="unit" id="u-reg"><div class="uname">Registros</div><div class="uinfo">guardan A, B, C</div></div>
+    </div>
+    <div class="fde-readout" id="fde">Pulsa "Siguiente paso" para iniciar el ciclo.</div>
+    <div class="controls">
+      <button class="btn" id="step">Siguiente paso ▸</button>
+      <button class="btn ghost sm" id="reset">Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="callout signal"><strong>Ejemplo:</strong> para <span class="mono">C = A + B</span>, la CPU <em>busca</em> la instrucción, la <em>decodifica</em> como una suma, la ALU <em>ejecuta</em> A+B y guarda el resultado en un registro.</div>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="2-logica-digital.html">← Lógica digital</a>
+    <a class="btn" href="4-memoria.html">Siguiente: Memoria →</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t3";
+Tracker.pageView(TEMA, "1.3 Elementos del procesador");
+
+const uc=document.getElementById("u-uc"), alu=document.getElementById("u-alu"), reg=document.getElementById("u-reg");
+const fde=document.getElementById("fde");
+const PASOS = [
+  { u:[uc],      txt:"① BUSCAR (Fetch): la UC trae la instrucción 'sumar A y B' desde la memoria." },
+  { u:[uc],      txt:"② DECODIFICAR (Decode): la UC interpreta que debe hacer una suma." },
+  { u:[reg],     txt:"   Los registros entregan los valores A=2 y B=3." },
+  { u:[alu],     txt:"③ EJECUTAR (Execute): la ALU calcula 2 + 3 = 5." },
+  { u:[reg],     txt:"   El resultado C=5 se guarda en un registro. Ciclo completo ✓" }
+];
+let i = -1;
+function paint(){
+  [uc,alu,reg].forEach(u=>u.classList.remove("active"));
+  if(i<0){ fde.textContent='Pulsa "Siguiente paso" para iniciar el ciclo.'; return; }
+  const p = PASOS[i]; p.u.forEach(u=>u.classList.add("active")); fde.textContent = p.txt;
+}
+document.getElementById("step").onclick=()=>{
+  i = (i+1) % PASOS.length;
+  paint();
+  Tracker.interaccion(TEMA, "paso del ciclo FDE", i+1);
+  if(i === PASOS.length-1) Tracker.completarModulo(TEMA, "1.3 Elementos del procesador");
+};
+document.getElementById("reset").onclick=()=>{ i=-1; paint(); };
+paint();
+
+renderQuiz(TEMA, [
+  { q:"¿Cuál es el orden correcto del ciclo de instrucción?",
+    opciones:["Ejecutar → Buscar → Decodificar","Buscar → Decodificar → Ejecutar","Decodificar → Ejecutar → Buscar","Buscar → Ejecutar → Decodificar"], correcta:1 },
+  { q:"¿Qué unidad realiza los cálculos aritméticos?",
+    opciones:["La Unidad de Control","La caché","La ALU","Los registros"], correcta:2 },
+  { q:"La memoria interna más rápida y cercana al procesador son…",
+    opciones:["los registros","el disco duro","la RAM","la fuente de poder"], correcta:0 }
+]);
+</script>
+</body>
+</html>

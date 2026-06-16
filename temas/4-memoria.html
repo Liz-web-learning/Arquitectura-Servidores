@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.4 Subsistema de memoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.4</p>
+    <h1>Subsistema de memoria</h1>
+    <p class="muted">La memoria se organiza en una jerarquía: a mayor velocidad, menor capacidad y mayor costo. El objetivo es dar la ilusión de una memoria a la vez grande y rápida.</p>
+  </header>
+
+  <div class="lab">
+    <h3>▤ Laboratorio · Jerarquía de memoria</h3>
+    <p class="hint">Haz clic en cada nivel para ver sus características.</p>
+    <div class="pyramid">
+      <div class="layer l0" data-k="reg">Registros / Caché</div>
+      <div class="layer l1" data-k="ram">RAM</div>
+      <div class="layer l2" data-k="ssd">SSD</div>
+      <div class="layer l3" data-k="hdd">Disco duro (HDD)</div>
+    </div>
+    <div class="layer-info" id="layer-info">↑ más rápido y caro · ↓ más capacidad y económico</div>
+  </div>
+
+  <div class="callout">
+    <strong>En servidores</strong> es común la memoria <strong>ECC</strong> (Error-Correcting Code), que detecta y corrige errores de bits para evitar caídas durante la operación continua.
+  </div>
+
+  <h2>Volátil vs. no volátil</h2>
+  <p>La memoria <strong>volátil</strong> (RAM) pierde su contenido al apagar el equipo; la <strong>no volátil</strong> (disco) lo conserva. Clasifica cada elemento:</p>
+
+  <div class="lab">
+    <h3>🧲 Laboratorio · Clasifica</h3>
+    <p class="hint">Haz clic en un elemento y luego en la categoría correcta.</p>
+    <div id="tokens" style="margin-bottom:12px"></div>
+    <div class="classify">
+      <div class="bucket" data-cat="volatil"><h4>VOLÁTIL (se borra al apagar)</h4><div class="drop"></div></div>
+      <div class="bucket" data-cat="novolatil"><h4>NO VOLÁTIL (se conserva)</h4><div class="drop"></div></div>
+    </div>
+    <div class="quiz-result" id="clasif-res"></div>
+  </div>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="3-procesador.html">← El procesador</a>
+    <a class="btn" href="5-entrada-salida.html">Siguiente: Entrada-Salida →</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t4";
+Tracker.pageView(TEMA, "1.4 Subsistema de memoria");
+
+const INFO = {
+  reg:"Registros/Caché · velocidad MÁXIMA · capacidad mínima (KB–MB) · volátil · dentro del procesador.",
+  ram:"RAM · alta velocidad · capacidad media (GB) · volátil · aquí viven los programas en ejecución.",
+  ssd:"SSD · velocidad media-alta · capacidad alta (TB) · NO volátil · almacenamiento del servidor.",
+  hdd:"Disco duro · la más lenta · la mayor capacidad y la más económica · NO volátil."
+};
+document.querySelectorAll(".layer").forEach(l=>{
+  l.onclick=()=>{ document.getElementById("layer-info").textContent = INFO[l.dataset.k];
+    Tracker.interaccion(TEMA,"ver nivel de memoria", l.dataset.k); };
+});
+
+// Clasificador
+const ITEMS = [
+  {t:"RAM", cat:"volatil"}, {t:"Registros", cat:"volatil"}, {t:"Caché", cat:"volatil"},
+  {t:"SSD", cat:"novolatil"}, {t:"Disco duro", cat:"novolatil"}, {t:"Memoria USB", cat:"novolatil"}
+];
+let seleccion = null, ok = 0;
+const tokens = document.getElementById("tokens");
+tokens.innerHTML = ITEMS.map((it,i)=>`<span class="token" data-i="${i}" data-cat="${it.cat}">${it.t}</span>`).join("");
+tokens.querySelectorAll(".token").forEach(tk=>{
+  tk.onclick=()=>{ if(tk.classList.contains("placed-ok"))return;
+    tokens.querySelectorAll(".token").forEach(x=>x.style.outline="");
+    seleccion = tk; tk.style.outline="2px solid var(--signal)"; };
+});
+document.querySelectorAll(".bucket").forEach(b=>{
+  b.onclick=()=>{
+    if(!seleccion) return;
+    const correcto = seleccion.dataset.cat === b.dataset.cat;
+    if(correcto){
+      seleccion.classList.add("placed-ok"); seleccion.style.outline="";
+      b.querySelector(".drop").appendChild(seleccion); ok++;
+      Tracker.interaccion(TEMA,"clasificar correcto", seleccion.textContent);
+      if(ok===ITEMS.length){ document.getElementById("clasif-res").textContent="✓ ¡Todo clasificado correctamente!";
+        document.getElementById("clasif-res").style.color="var(--ok)";
+        Tracker.completarModulo(TEMA,"1.4 Subsistema de memoria"); }
+    } else {
+      seleccion.classList.add("placed-bad");
+      setTimeout(()=>seleccion && seleccion.classList.remove("placed-bad"), 700);
+      Tracker.interaccion(TEMA,"clasificar incorrecto", seleccion.textContent);
+    }
+    seleccion = null;
+  };
+});
+
+renderQuiz(TEMA, [
+  { q:"En la jerarquía de memoria, ¿qué nivel es el más rápido?",
+    opciones:["Disco duro","RAM","Registros/Caché","Memoria USB"], correcta:2 },
+  { q:"La memoria que pierde su contenido al apagar el equipo es…",
+    opciones:["no volátil","volátil","permanente","óptica"], correcta:1 },
+  { q:"La memoria ECC en servidores sirve para…",
+    opciones:["acelerar el disco","detectar y corregir errores de bits","ampliar la pantalla","reducir el consumo de la fuente"], correcta:1 }
+]);
+</script>
+</body>
+</html>

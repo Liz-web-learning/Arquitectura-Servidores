@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.1 Evolución de los dispositivos de cómputo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.1</p>
+    <h1>Evolución de los dispositivos de cómputo</h1>
+    <p class="muted">El cómputo avanza por generaciones, cada una definida por el componente que hace la conmutación electrónica. La regla: más pequeño, más rápido, más barato.</p>
+  </header>
+
+  <div class="lab">
+    <h3>⏳ Laboratorio · Línea de tiempo</h3>
+    <p class="hint">Haz clic en cada generación para ver el detalle.</p>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <h2>La Ley de Moore en acción</h2>
+  <p>Gordon Moore observó que el número de transistores por chip se duplica aproximadamente cada dos años. Mueve el control y observa el crecimiento exponencial.</p>
+
+  <div class="lab">
+    <h3>📈 Laboratorio · Densidad de transistores</h3>
+    <div class="controls">
+      <input type="range" id="moore" min="0" max="27" value="0" step="1">
+      <span class="mono" id="moore-year">1971</span>
+    </div>
+    <div class="stat-big" id="moore-count">2,300 transistores</div>
+    <div class="bar-track" style="height:14px"><div class="bar-fill" id="moore-bar" style="width:1%"></div></div>
+    <p class="hint" id="moore-ej">Intel 4004 — el primer microprocesador.</p>
+  </div>
+
+  <div class="callout signal">
+    <strong>Idea clave:</strong> cada generación reduce tamaño y costo mientras multiplica la velocidad. Los servidores actuales (Intel Xeon, AMD EPYC) son herederos directos de esta carrera.
+  </div>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="../unidad1/index.html">⌂ Placa U1</a>
+    <a class="btn" href="2-logica-digital.html">Siguiente: Lógica digital →</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t1";
+Tracker.pageView(TEMA, "1.1 Evolución de los dispositivos de cómputo");
+
+const GENS = [
+  { yr:"1940-56", t:"1ª · Tubos de vacío", d:"Enormes, lentos y de alto consumo. Ejemplo: la ENIAC pesaba 27 toneladas y usaba ~18,000 tubos." },
+  { yr:"1956-63", t:"2ª · Transistores", d:"Más pequeños, rápidos y confiables. Ejemplo: la IBM 1401, muy usada en empresas." },
+  { yr:"1964-71", t:"3ª · Circuitos integrados", d:"Miles de transistores en un chip. Ejemplo: IBM System/360, base de los servidores corporativos." },
+  { yr:"1971-hoy", t:"4ª · Microprocesadores", d:"La CPU completa en un chip. Ejemplo: Intel 4004 (1971); hoy, Xeon y EPYC en servidores." },
+  { yr:"Actual", t:"Nube y virtualización", d:"Procesadores con decenas de núcleos, cómputo en la nube y centros de datos." }
+];
+const tl = document.getElementById("timeline");
+tl.innerHTML = GENS.map((g,i)=>`<div class="gen" data-i="${i}">
+  <div class="yr">${g.yr}</div>
+  <div class="body"><strong>${g.t}</strong><div class="detail">${g.d}</div></div></div>`).join("");
+tl.querySelectorAll(".gen").forEach(el=>{
+  el.onclick=()=>{ el.classList.toggle("active");
+    Tracker.interaccion(TEMA, "abrir generación", GENS[el.dataset.i].t); };
+});
+
+// Ley de Moore — duplica cada 2 años desde 1971 (2,300 transistores)
+const moore = document.getElementById("moore");
+const fmt = n => n.toLocaleString("es-MX");
+const ejemplos = {0:"Intel 4004 — primer microprocesador.",10:"Intel 80486 — PCs de los 90.",18:"Pentium 4 — inicio de los 2000.",27:"Núcleos modernos de servidor (miles de millones de transistores)."};
+function pintaMoore(){
+  const i = +moore.value;
+  const year = 1971 + i*2;
+  const count = Math.round(2300 * Math.pow(2, i));
+  document.getElementById("moore-year").textContent = year;
+  document.getElementById("moore-count").textContent = fmt(count) + " transistores";
+  document.getElementById("moore-bar").style.width = Math.min(100, (i/27*100)+1) + "%";
+  let ej = "Crecimiento exponencial: el chip se duplica cada ~2 años.";
+  Object.keys(ejemplos).forEach(k=>{ if(i>=+k) ej = ejemplos[k]; });
+  document.getElementById("moore-ej").textContent = ej;
+}
+moore.addEventListener("input", pintaMoore);
+moore.addEventListener("change", ()=>Tracker.interaccion(TEMA,"mover Ley de Moore", 1971+(+moore.value)*2));
+pintaMoore();
+
+renderQuiz(TEMA, [
+  { q:"¿Qué componente define a la primera generación de computadoras?",
+    opciones:["Transistores","Tubos de vacío","Circuitos integrados","Microprocesadores"], correcta:1 },
+  { q:"Según la Ley de Moore, el número de transistores por chip…",
+    opciones:["se mantiene constante","se reduce a la mitad cada año","se duplica aprox. cada dos años","crece de forma lineal"], correcta:2 },
+  { q:"El microprocesador (CPU completa en un chip) caracteriza a la…",
+    opciones:["2ª generación","3ª generación","4ª generación","1ª generación"], correcta:2 }
+]);
+</script>
+</body>
+</html>

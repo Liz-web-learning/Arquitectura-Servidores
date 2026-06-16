@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.6 Multiprocesamiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.6</p>
+    <h1>Multiprocesamiento</h1>
+    <p class="muted">Es el uso de dos o más procesadores o núcleos trabajando en paralelo. Es fundamental en servidores que atienden a muchos usuarios a la vez.</p>
+  </header>
+
+  <ul>
+    <li><strong>SMP (simétrico):</strong> varios procesadores comparten la misma memoria y el sistema operativo los trata por igual. Ej.: un servidor con 2 CPU Xeon repartiendo peticiones.</li>
+    <li><strong>AMP (asimétrico):</strong> cada procesador tiene tareas específicas asignadas.</li>
+    <li><strong>Multinúcleo (multicore):</strong> varios núcleos en un mismo chip. Ej.: un procesador de 16 núcleos ejecuta 16 hilos a la vez.</li>
+  </ul>
+
+  <div class="lab">
+    <h3>⚏ Laboratorio · Núcleos en paralelo</h3>
+    <p class="hint">12 tareas iguales, cada una tarda 1 unidad de tiempo. Cambia el número de núcleos y observa el tiempo total.</p>
+    <div class="controls">
+      <input type="range" id="cores" min="1" max="12" value="1" step="1">
+      <span class="mono"><span id="cores-n">1</span> núcleo(s)</span>
+    </div>
+    <div class="stat-big" id="tiempo">Tiempo total: 12 u</div>
+    <div class="bars" id="core-bars"></div>
+    <p class="hint" id="speedup"></p>
+  </div>
+
+  <div class="callout signal"><strong>Ejemplo:</strong> en un servidor de base de datos, mientras un núcleo procesa una consulta de ventas, otro atiende un respaldo y otro responde un reporte: todo de forma simultánea.</div>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="5-entrada-salida.html">← Entrada-Salida</a>
+    <a class="btn" href="7-redundancia.html">Siguiente: Redundancia →</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t6";
+Tracker.pageView(TEMA, "1.6 Multiprocesamiento");
+
+const TAREAS = 12;
+const cores = document.getElementById("cores");
+function pinta(){
+  const n = +cores.value;
+  const tiempo = Math.ceil(TAREAS / n);
+  document.getElementById("cores-n").textContent = n;
+  document.getElementById("tiempo").textContent = `Tiempo total: ${tiempo} u`;
+  const bars = document.getElementById("core-bars");
+  bars.innerHTML = "";
+  for(let c=0;c<n;c++){
+    const carga = Math.floor(TAREAS/n) + (c < TAREAS%n ? 1 : 0);
+    bars.innerHTML += `<div class="bar-row"><span class="lbl">Núcleo ${c+1}</span>
+      <div class="bar-track"><div class="bar-fill signal" style="width:${carga/TAREAS*100}%"></div></div></div>`;
+  }
+  const sp = (TAREAS / tiempo).toFixed(1);
+  document.getElementById("speedup").textContent = `Aceleración aproximada: ${sp}× respecto a un solo núcleo.`;
+}
+cores.addEventListener("input", pinta);
+cores.addEventListener("change", ()=>{ Tracker.interaccion(TEMA,"cambiar núcleos", cores.value);
+  Tracker.completarModulo(TEMA,"1.6 Multiprocesamiento"); });
+pinta();
+
+renderQuiz(TEMA, [
+  { q:"El multiprocesamiento simétrico (SMP) se caracteriza por…",
+    opciones:["un solo procesador","procesadores que comparten la misma memoria por igual","procesadores sin sistema operativo","memoria no volátil"], correcta:1 },
+  { q:"Un procesador 'multicore' tiene…",
+    opciones:["varios núcleos en un mismo chip","varios discos","varias fuentes de poder","varias pantallas"], correcta:0 },
+  { q:"El principal beneficio del multiprocesamiento en servidores es…",
+    opciones:["reducir el tamaño físico","atender más tareas/usuarios en paralelo","eliminar la memoria RAM","apagar el equipo más rápido"], correcta:1 }
+]);
+</script>
+</body>
+</html>

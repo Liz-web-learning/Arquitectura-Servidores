@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.7 Concepto de redundancia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><a href="../../index.html" style="color:inherit">← Arquitectura de <b>Servidores</b></a></div>
+  <div class="spacer"></div><div class="who"></div>
+</div>
+
+<main class="wrap tema-body">
+  <header class="tema-head">
+    <p class="num">COMPONENTE 1.7</p>
+    <h1>Concepto de redundancia</h1>
+    <p class="muted">Duplicar componentes críticos para que, si uno falla, otro continúe la operación. Es la base de la alta disponibilidad en servidores.</p>
+  </header>
+
+  <ul>
+    <li><strong>Fuentes de poder redundantes:</strong> si una falla, la otra mantiene el equipo encendido.</li>
+    <li><strong>RAID:</strong> distribuye o duplica datos en varios discos. RAID 1 (espejo) copia la misma información en dos discos.</li>
+    <li><strong>Servidores en clúster:</strong> si un servidor cae, otro asume su carga (<em>failover</em>).</li>
+    <li><strong>Conexiones de red duplicadas</strong> (NIC teaming).</li>
+  </ul>
+
+  <h2>RAID 1 en vivo</h2>
+  <p>Dos discos guardan exactamente los mismos datos. Provoca el fallo de uno y observa qué pasa con el servicio.</p>
+
+  <div class="lab">
+    <h3>⛉ Laboratorio · Simulador RAID 1 (espejo)</h3>
+    <div class="disks">
+      <div class="disk" id="d1"><div class="platter">💽</div><div class="data">DATOS: OK</div><div class="status">en línea</div></div>
+      <div class="disk" id="d2"><div class="platter">💽</div><div class="data">DATOS: OK</div><div class="status">en línea</div></div>
+    </div>
+    <div class="readout true" id="raid-msg">Servicio: <b>DISPONIBLE</b> · los datos están duplicados.</div>
+    <div class="controls">
+      <button class="btn" id="fail">⚠ Provocar fallo en Disco 1</button>
+      <button class="btn ghost sm" id="repair">Reemplazar disco</button>
+    </div>
+  </div>
+
+  <div class="callout"><strong>Idea clave:</strong> la redundancia no mejora la velocidad, sino la <em>confiabilidad y continuidad</em>. Un servidor bancario debe seguir operando aunque falle un disco o una fuente.</div>
+
+  <div class="quiz"><h2>Comprueba lo que aprendiste</h2><div id="quiz"></div></div>
+
+  <nav class="tema-nav">
+    <a class="btn ghost" href="6-multiprocesamiento.html">← Multiprocesamiento</a>
+    <a class="btn" href="../unidad1/index.html">⌂ Volver a la placa</a>
+  </nav>
+</main>
+
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TEMA = "t7";
+Tracker.pageView(TEMA, "1.7 Concepto de redundancia");
+
+const d1=document.getElementById("d1"), msg=document.getElementById("raid-msg");
+document.getElementById("fail").onclick=()=>{
+  d1.classList.add("failed");
+  d1.querySelector(".status").textContent="FALLO";
+  d1.querySelector(".data").textContent="DATOS: ✕";
+  msg.className="readout true";
+  msg.innerHTML="Servicio: <b>DISPONIBLE</b> · el Disco 2 (espejo) sigue sirviendo los datos. Sin pérdida ni interrupción.";
+  Tracker.interaccion(TEMA,"provocar fallo RAID 1","disco1");
+  Tracker.completarModulo(TEMA,"1.7 Concepto de redundancia");
+};
+document.getElementById("repair").onclick=()=>{
+  d1.classList.remove("failed");
+  d1.querySelector(".status").textContent="en línea";
+  d1.querySelector(".data").textContent="DATOS: OK";
+  msg.className="readout true";
+  msg.innerHTML="Servicio: <b>DISPONIBLE</b> · disco reemplazado y datos re-sincronizados.";
+  Tracker.interaccion(TEMA,"reemplazar disco","disco1");
+};
+
+renderQuiz(TEMA, [
+  { q:"El objetivo principal de la redundancia es…",
+    opciones:["aumentar la velocidad de cálculo","garantizar la continuidad ante fallos","reducir el consumo eléctrico","ampliar la memoria RAM"], correcta:1 },
+  { q:"En un RAID 1 (espejo), si un disco falla…",
+    opciones:["se pierden todos los datos","el otro disco mantiene la información","el servidor se apaga","se borra la RAM"], correcta:1 },
+  { q:"Cuando un servidor cae y otro asume su carga automáticamente, eso es…",
+    opciones:["overclocking","failover","polling","caché"], correcta:1 }
+]);
+</script>
+</body>
+</html>
