@@ -132,8 +132,17 @@
             <span>${o}</span>
           </label>`).join("")}
       </div>`).join("") +
-      `<button class="btn-quiz-check" id="quiz-check">Revisar respuestas</button>
-       <p class="quiz-result" id="quiz-result"></p>`;
+      `<p class="quiz-result" id="quiz-result"></p>`;
+
+    // Insertar "Revisar respuestas" en la barra de navegación inferior
+    const nav = document.querySelector("nav");
+    if (nav) {
+      const btnCheck = document.createElement("button");
+      btnCheck.className = "btn-quiz-check";
+      btnCheck.id = "quiz-check";
+      btnCheck.textContent = "Revisar respuestas";
+      nav.insertBefore(btnCheck, nav.firstElementChild);
+    }
 
     document.getElementById("quiz-check").onclick = () => {
       let aciertos = 0;

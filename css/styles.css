@@ -762,3 +762,63 @@ td .mini-bar > span { display: block; height: 100%; background: var(--blue); }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Hero centrado + crédito de autoría ---------- */
+.course-hero {
+  text-align: center;
+}
+.course-hero .eyebrow {
+  display: block;
+  text-align: center;
+}
+.course-hero h1 {
+  text-align: center;
+}
+.course-hero .sub {
+  margin: 0 auto;
+  text-align: center;
+}
+.course-author {
+  font-size: .92rem;
+  color: var(--muted);
+  margin: 0 auto 14px;
+  text-align: center;
+}
+.course-author strong {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.footer {
+  text-align: center;
+}
+
+/* ---------- Barra de navegación inferior de temas (3 elementos en línea) ---------- */
+nav.tema-nav-inline,
+nav[style*="justify-content:space-between"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding: 20px 0;
+  margin-top: 32px;
+}
+nav[style*="justify-content:space-between"] .btn-quiz-check {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: var(--r);
+  background: var(--white);
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
+  font-family: var(--f-body);
+  font-size: .88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+nav[style*="justify-content:space-between"] .btn-quiz-check:hover {
+  background: var(--blue-light);
+}
