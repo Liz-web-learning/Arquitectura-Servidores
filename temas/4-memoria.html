@@ -6,8 +6,18 @@
 <title>1.4 Subsistema de memoria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/styles.css">
+<script src="../js/config.js"></script>
+<script src="../js/tracking.js"></script>
+<script>
+(function(){
+  try{
+    var s=JSON.parse(localStorage.getItem('seg_estudiante'));
+    if(!s||!s.correo){ location.href='../index.html'; }
+  }catch(e){ location.href='../index.html'; }
+})();
+</script>
 </head>
 <body>
 <div class="topbar">
@@ -17,7 +27,7 @@
 
 <main class="wrap tema-body">
   <header class="tema-head">
-    <p class="num">COMPONENTE 1.4</p>
+    <p class="tema-num">COMPONENTE 1.4</p>
     <h1>Subsistema de memoria</h1>
     <p class="muted">La memoria se organiza en una jerarquía: a mayor velocidad, menor capacidad y mayor costo. El objetivo es dar la ilusión de una memoria a la vez grande y rápida.</p>
   </header>
